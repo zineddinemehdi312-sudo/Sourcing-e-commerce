@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Sourcing DZ">
+<meta name="theme-color" content="#185FA5">
+<title>Sourcing DZ</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f2f2f7; }
+:root {
+  --blue: #185FA5; --blue-l: #E6F1FB;
+  --green: #3B6D11; --green-l: #EAF3DE;
+  --red: #A32D2D; --red-l: #FCEBEB;
+  --amber: #854F0B; --amber-l: #FAEEDA;
+  --gray: #5F5E5A;
+}
+input, select, textarea, button { font-family: inherit; }
+input[type=range] { accent-color: var(--blue); width: 100%; }
+
+/* HEADER */
+#header { background: var(--blue); padding: 14px 14px 10px; position: sticky; top: 0; z-index: 100; }
+#header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.h-title { color: #fff; font-size: 16px; font-weight: 600; }
+.h-sub { color: #B5D4F4; font-size: 11px; margin-top: 2px; }
+#tabs { display: flex; gap: 4px; }
+.tb { border: none; padding: 6px 9px; border-radius: 8px; font-size: 11px; cursor: pointer; }
+.tb.on { background: rgba(255,255,255,0.22); color: #fff; font-weight: 600; }
+.tb.off { background: transparent; color: #B5D4F4; }
+#pgwrap { background: rgba(255,255,255,0.15); border-radius: 6px; height: 4px; overflow: hidden; }
+#pgbar { background: #fff; height: 100%; width: 0%; transition: width 0.3s; border-radius: 6px; }
+
+/* PANELS */
+.panel { display: none; padding-bottom: 50px; }
+.panel.active { display: block; }
+
+/* GENERIC */
+.card { background: #fff; border-radius: 12px; margin: 10px 12px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.07); overflow: hidden; }
+.sec-hd { padding: 9px 14px; display: flex; justify-content: space-between; align-items: center; }
+.sec-hd.blue { background: var(--blue-l); border-bottom: 1px solid #C5DCF5; }
+.sec-hd.amber { background: var(--amber-l); border-bottom: 1px solid #FAC775; }
+.sec-hd.red { background: var(--red-l); border-bottom: 1px solid #F7C1C1; }
+.sec-hd.green { background: var(--green-l); border-bottom: 1px solid #C0DD97; }
+.sec-label { font-size: 11px; font-weight: 600; letter-spacing: 0.3px; }
+.lbl-blue { color: var(--blue); } .lbl-amber { color: var(--amber); } .lbl-red { color: var(--red); } .lbl-green { color: var(--green); }
+.sec-count { font-size: 11px; font-weight: 500; color: var(--blue); }
+
+/* FORM */
+.fl { display: flex; flex-direction: column; gap: 3px; }
+.fl label { font-size: 11px; color: var(--gray); font-weight: 500; }
+.fi { width: 100%; border: 0.5px solid #ddd; border-radius: 8px; padding: 9px 11px; font-size: 14px; background: #fff; color: #333; -webkit-appearance: none; }
+.fi:focus { outline: none; border-color: var(--blue); }
+textarea.fi { resize: none; }
+
+/* CHECK */
+.ci { display: flex; align-items: flex-start; gap: 10px; padding: 8px 10px; border-radius: 8px; cursor: pointer; border: 0.5px solid #e5e5e5; background: #fff; margin-bottom: 4px; }
+.ci.on { border-color: #C0DD97; background: var(--green-l); }
+.cc { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid #ccc; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+.cc.on { background: var(--green); border-color: var(--green); }
+.cc.on::after { content: "✓"; color: #fff; font-size: 11px; }
+.ct { font-size: 13px; color: #333; line-height: 1.4; }
+.ct.on { color: var(--green); }
+
+/* PRODUCT ROW */
+.prod-row { background: #fff; border: 0.5px solid #ddd; border-radius: 10px; padding: 12px; margin-bottom: 10px; position: relative; }
+.prod-row-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 0.5px solid #eee; }
+.prod-num { font-size: 12px; font-weight: 600; color: var(--blue); background: var(--blue-l); padding: 3px 9px; border-radius: 20px; }
+.prod-del { background: var(--red-l); border: none; color: var(--red); font-size: 12px; padding: 4px 10px; border-radius: 8px; cursor: pointer; }
+.prod-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.prod-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.span2 { grid-column: span 2; }
+
+/* BUTTONS */
+.btn { width: 100%; border: none; padding: 13px; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; }
+.btn:active { opacity: 0.75; }
+.btn-blue { background: var(--blue); color: #fff; }
+.btn-green { background: var(--green); color: #fff; }
+.btn-add { background: var(--blue-l); color: var(--blue); border: 1px dashed #89BDE8; }
+.btn-out { background: transparent; border: 0.5px solid #ddd; color: var(--gray); }
+
+/* CALCUL */
+.cc2 { background: #fff; border-radius: 12px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.07); }
+.mg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.mt { border-radius: 8px; padding: 10px; }
+.verdict { margin-top: 10px; padding: 10px 14px; border-radius: 8px; text-align: center; font-size: 13px; font-weight: 500; }
+
+/* CSV TABLE */
+.tbl-wrap { overflow-x: auto; border-radius: 10px; }
+table { width: 100%; border-collapse: collapse; font-size: 11px; background: #fff; min-width: 500px; }
+th { background: var(--blue); color: #fff; padding: 8px 10px; text-align: left; white-space: nowrap; }
+td { padding: 7px 10px; border-bottom: 0.5px solid #eee; color: #333; white-space: nowrap; }
+tr:last-child td { border-bottom: none; }
+tr:nth-child(even) td { background: #f9f9f9; }
+.best { color: var(--green); font-weight: 600; }
+
+/* PIEGE */
+.pg-item { display: flex; gap: 8px; align-items: flex-start; padding: 5px 0; }
+
+/* TOAST */
+#toast { position: fixed; bottom: 35px; left: 50%; transform: translateX(-50%) translateY(50px); background: #1a1a1a; color: #fff; padding: 9px 20px; border-radius: 22px; font-size: 13px; font-weight: 500; opacity: 0; transition: opacity 0.2s, transform 0.2s; z-index: 9999; pointer-events: none; white-space: nowrap; }
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* EMPTY */
+.empty { text-align: center; padding: 30px 20px; color: var(--gray); }
+.empty-ico { font-size: 36px; margin-bottom: 8px; }
+.empty-txt { font-size: 13px; line-height: 1.5; }
+
+/* VISIT HISTORY */
+.visit-card { background: #fff; border-radius: 10px; padding: 12px; margin-bottom: 8px; border: 0.5px solid #ddd; }
+.visit-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+.visit-name { font-size: 14px; font-weight: 600; color: var(--blue); }
+.visit-meta { font-size: 11px; color: var(--gray); margin-top: 2px; }
+.visit-products { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.prod-tag { font-size: 10px; background: var(--blue-l); color: var(--blue); padding: 2px 7px; border-radius: 10px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="header">
+  <div id="header-top">
+    <div>
+      <div class="h-title">☀️ Sourcing DZ</div>
+      <div class="h-sub" id="subtitle">Été 2026 · Marché Algérien</div>
+    </div>
+    <div id="tabs">
+      <button class="tb on"  onclick="showTab('visite',this)">📝 Visite</button>
+      <button class="tb off" onclick="showTab('checks',this)">✓ Checks</button>
+      <button class="tb off" onclick="showTab('calcul',this)">💰 Calcul</button>
+      <button class="tb off" onclick="showTab('csv',this)">📊 CSV</button>
+    </div>
+  </div>
+  <div id="pgwrap"><div id="pgbar"></div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     ONGLET VISITE
+════════════════════════════════════════════ -->
+<div id="panel-visite" class="panel active">
+
+  <!-- Infos fournisseur -->
+  <div class="card" style="margin-top:12px;">
+    <div class="sec-hd amber">
+      <span class="sec-label lbl-amber">🏪 FOURNISSEUR</span>
+    </div>
+    <div style="padding:12px;display:flex;flex-direction:column;gap:9px;">
+      <div class="fl">
+        <label>📅 Date</label>
+        <input type="date" id="v-date" class="fi" oninput="autoSave()">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div class="fl">
+          <label>📍 Marché</label>
+          <select id="v-marche" class="fi" oninput="autoSave()">
+            <option value="">---</option>
+            <option>El Hamiz</option>
+            <option>Bachdjarrah</option>
+            <option>Bab Ezzouar</option>
+            <option>Chéraga</option>
+            <option>Autre</option>
+          </select>
+        </div>
+        <div class="fl">
+          <label>📞 WhatsApp</label>
+          <input type="tel" id="v-tel" class="fi" placeholder="0555..." oninput="autoSave()">
+        </div>
+      </div>
+      <div class="fl">
+        <label>🏪 Nom du fournisseur</label>
+        <input type="text" id="v-fourn" class="fi" placeholder="Ex: Mohamed, Stand 12..." oninput="autoSave()">
+      </div>
+      <div class="fl">
+        <label>📦 Spécialité / Type de marchandise</label>
+        <input type="text" id="v-spec" class="fi" placeholder="Ex: Accessoires maison, gadgets..." oninput="autoSave()">
+      </div>
+    </div>
+  </div>
+
+  <!-- Produits vus -->
+  <div style="margin:10px 12px 0;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <span style="font-size:13px;font-weight:600;color:#333;">Produits vus chez ce fournisseur</span>
+      <span id="prod-count" style="font-size:11px;color:var(--gray);"></span>
+    </div>
+    <div id="produits-list"></div>
+    <button class="btn btn-add" onclick="addProduit()" style="margin-bottom:4px;">+ Ajouter un produit</button>
+  </div>
+
+  <!-- Notes globales -->
+  <div class="card">
+    <div class="sec-hd blue">
+      <span class="sec-label lbl-blue">📝 Notes générales sur le fournisseur</span>
+    </div>
+    <div style="padding:12px;">
+      <textarea id="v-notes" class="fi" rows="3" placeholder="Impression générale, facilité de négo, fiabilité..." oninput="autoSave()"></textarea>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div style="padding:12px;display:flex;flex-direction:column;gap:8px;">
+    <button class="btn btn-green" onclick="saveVisit()">💾 Enregistrer la visite dans le CSV</button>
+    <button class="btn btn-out" onclick="resetVisit()">Nouvelle visite (vider le formulaire)</button>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════
+     ONGLET CHECKS
+════════════════════════════════════════════ -->
+<div id="panel-checks" class="panel">
+  <div class="card" style="margin-top:12px;">
+    <div class="sec-hd blue"><span class="sec-label lbl-blue">AVANT DE PARTIR</span><span class="sec-count" id="cnt-pre">0/6</span></div>
+    <div style="padding:8px 12px;" id="lst-pre"></div>
+    <div class="sec-hd blue" style="border-top:1px solid #C5DCF5;"><span class="sec-label lbl-blue">PRIX & COMMANDE</span><span class="sec-count" id="cnt-prix">0/5</span></div>
+    <div style="padding:8px 12px;" id="lst-prix"></div>
+    <div class="sec-hd blue" style="border-top:1px solid #C5DCF5;"><span class="sec-label lbl-blue">QUALITÉ & STOCK</span><span class="sec-count" id="cnt-qual">0/4</span></div>
+    <div style="padding:8px 12px;" id="lst-qual"></div>
+    <div class="sec-hd blue" style="border-top:1px solid #C5DCF5;"><span class="sec-label lbl-blue">NÉGOCIATION</span><span class="sec-count" id="cnt-nego">0/4</span></div>
+    <div style="padding:8px 12px;" id="lst-nego"></div>
+  </div>
+  <div class="card" style="margin-top:10px;">
+    <div class="sec-hd red"><span class="sec-label lbl-red">⚠️ PIÈGES À ÉVITER</span></div>
+    <div style="padding:12px;" id="lst-pieges"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     ONGLET CALCUL
+════════════════════════════════════════════ -->
+<div id="panel-calcul" class="panel">
+  <div style="padding:12px;display:flex;flex-direction:column;gap:10px;">
+    <div style="background:var(--green-l);border:0.5px solid #C0DD97;border-radius:12px;padding:14px;text-align:center;">
+      <div style="font-size:11px;color:var(--green);font-weight:600;">RÈGLE D'OR</div>
+      <div style="font-size:20px;font-weight:600;color:var(--green);margin:5px 0;">Prix vente = Prix achat × 3</div>
+      <div style="font-size:11px;color:var(--green);">minimum pour être rentable</div>
+    </div>
+    <div class="cc2">
+      <div style="font-size:12px;color:var(--gray);font-weight:600;margin-bottom:11px;">CALCULATEUR RAPIDE</div>
+      <div class="fl" style="margin-bottom:10px;"><label>Prix d'achat (DZD)</label><input type="number" id="ca" class="fi" placeholder="Ex: 800" oninput="calcR()"></div>
+      <div class="fl" style="margin-bottom:10px;"><label>Frais livraison (DZD)</label><input type="number" id="cl" class="fi" value="350" oninput="calcR()"></div>
+      <div class="fl" style="margin-bottom:10px;"><label>Budget pub par vente (DZD)</label><input type="number" id="cp" class="fi" value="300" oninput="calcR()"></div>
+      <div id="calc-res" style="display:none;"></div>
+    </div>
+    <div class="cc2">
+      <div style="font-size:12px;color:var(--gray);font-weight:600;margin-bottom:11px;">BUDGET STOCK</div>
+      <div class="fl" style="margin-bottom:10px;"><label>Prix achat unitaire (DZD)</label><input type="number" id="cs" class="fi" placeholder="Ex: 800" oninput="calcS()"></div>
+      <div id="stock-res" style="display:none;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     ONGLET CSV
+════════════════════════════════════════════ -->
+<div id="panel-csv" class="panel">
+  <div style="padding:12px;display:flex;flex-direction:column;gap:10px;">
+
+    <!-- Stats -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;" id="csv-stats"></div>
+
+    <!-- Actions -->
+    <div class="cc2">
+      <div style="font-size:12px;color:var(--gray);font-weight:600;margin-bottom:11px;">📊 DONNÉES COLLECTÉES</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <button class="btn btn-blue" onclick="exportCSV()" style="flex:1;">⬇️ Télécharger CSV</button>
+        <button class="btn btn-out" onclick="clearCSV()" style="width:46px;padding:13px 0;">🗑️</button>
+      </div>
+      <p style="font-size:11px;color:var(--gray);line-height:1.5;">Le CSV contient une ligne par produit par fournisseur. Ouvre-le dans Excel pour trier et comparer.</p>
+    </div>
+
+    <!-- Tableau par produit -->
+    <div id="csv-view"></div>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────
+const PRODUITS_SUGGERES = ["Chaussures aquatiques","Panier tressé plage","Tapis anti-sable","Kit pêche léger","Chapeau de soleil","Bouteille isotherme","Gadgets BBQ","Kit hammam","Autre..."];
+const CHECKS = {
+  pre:  ["Liste des produits notée","Téléphone chargé pour photos","Prévoir 2h minimum par marché","Ne pas montrer trop d'enthousiasme","Visiter 3 fournisseurs avant de décider","Ne pas emmener tout le cash"],
+  prix: ["Demander le prix unitaire","Demander le prix pour 20 unités","Demander le prix pour 50 unités","Y a-t-il un minimum de commande ?","À partir de quelle quantité le prix baisse ?"],
+  qual: ["D'où vient le produit ? (Chine / local...)","Il y a une garantie ou retour possible ?","Prendre 2-3 pcs pour tester avant de commander","Stock encore dispo dans 1 mois ?"],
+  nego: ["Mentionner qu'on compare avec un autre fournisseur","Proposer commande test : \"20 pcs d'abord\"","Demander un échantillon ou prix coûtant","Obtenir un numéro WhatsApp pour commandes futures"]
+};
+const PIEGES = ["Commander en gros SANS avoir testé","Oublier les frais de livraison dans le calcul","Vérifier si le produit est déjà sur Ouedkniss à bas prix","Éviter les produits fragiles ou très volumineux","Ne jamais payer un gros stock sans ventes réelles"];
+const CSV_COLS = ["Date","Marché","Fournisseur","Téléphone","Spécialité fournisseur","Produit","Prix unitaire (DZD)","Prix ×20 (DZD)","Prix ×50 (DZD)","Moq","Qualité (/5)","Origine","Disponibilité","Notes produit","Notes fournisseur"];
+
+const SK = 'sdz_state_v4', CK = 'sdz_csv_v4';
+let visit = { date:'', marche:'', fourn:'', tel:'', spec:'', notes:'', produits:[] };
+let chk = {};
+let csvRows = [];
+
+// ─── PERSIST ────────────────────────────────────────────
+function load() {
+  try { const s=JSON.parse(localStorage.getItem(SK)||'{}'); if(s.visit) visit=s.visit; if(s.chk) chk=s.chk; } catch(e){}
+  try { csvRows=JSON.parse(localStorage.getItem(CK)||'[]'); } catch(e){ csvRows=[]; }
+}
+function persist() {
+  try { localStorage.setItem(SK,JSON.stringify({visit,chk})); } catch(e){}
+}
+function persistCSV() {
+  try { localStorage.setItem(CK,JSON.stringify(csvRows)); } catch(e){}
+}
+
+// ─── TOAST ──────────────────────────────────────────────
+function toast(msg,bg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.background=bg||'#1a1a1a';
+  t.classList.add('show');
+  clearTimeout(window._tt);
+  window._tt=setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// ─── AUTO-SAVE ──────────────────────────────────────────
+function autoSave(){
+  visit.date   = document.getElementById('v-date').value;
+  visit.marche = document.getElementById('v-marche').value;
+  visit.fourn  = document.getElementById('v-fourn').value;
+  visit.tel    = document.getElementById('v-tel').value;
+  visit.spec   = document.getElementById('v-spec').value;
+  visit.notes  = document.getElementById('v-notes').value;
+  persist();
+  toast('✓ Sauvegardé');
+}
+
+// ─── PRODUITS ───────────────────────────────────────────
+let prodId = 0;
+
+function addProduit(data) {
+  if(!visit.produits) visit.produits=[];
+  const id = data ? data._id : ++prodId;
+  const d = data || { _id:id, nom:'', prixU:'', prix20:'', prix50:'', moq:'', qualite:3, origine:'', dispo:'', notes:'' };
+  if(!data) { visit.produits.push(d); persist(); }
+
+  const wrap = document.getElementById('produits-list');
+  const div = document.createElement('div');
+  div.className = 'prod-row';
+  div.id = 'prow-'+id;
+  div.innerHTML = `
+    <div class="prod-row-header">
+      <span class="prod-num">Produit #${visit.produits.findIndex(p=>p._id===id)+1}</span>
+      <button class="prod-del" onclick="delProduit(${id})">✕ Supprimer</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div class="fl">
+        <label>Nom du produit</label>
+        <select class="fi" onchange="updateProd(${id},'nom',this.value);if(this.value==='Autre...')this.outerHTML='<input type=text class=fi placeholder=\\'Nom libre...\\' oninput=\\'updateProd(${id},\\'nom\\',this.value)\\'>'">
+          <option value="">Choisir ou saisir...</option>
+          ${PRODUITS_SUGGERES.map(p=>`<option value="${p}" ${d.nom===p?'selected':''}>${p}</option>`).join('')}
+        </select>
+        ${d.nom && !PRODUITS_SUGGERES.includes(d.nom) ? `<input type="text" class="fi" value="${d.nom}" oninput="updateProd(${id},'nom',this.value)" style="margin-top:4px;">` : ''}
+      </div>
+
+      <div class="prod-grid-3">
+        <div class="fl">
+          <label>Prix unit. (DZD)</label>
+          <input type="number" inputmode="numeric" class="fi" value="${d.prixU||''}" placeholder="___" oninput="updateProd(${id},'prixU',this.value)">
+        </div>
+        <div class="fl">
+          <label>Prix ×20 (DZD)</label>
+          <input type="number" inputmode="numeric" class="fi" value="${d.prix20||''}" placeholder="___" oninput="updateProd(${id},'prix20',this.value)">
+        </div>
+        <div class="fl">
+          <label>Prix ×50 (DZD)</label>
+          <input type="number" inputmode="numeric" class="fi" value="${d.prix50||''}" placeholder="___" oninput="updateProd(${id},'prix50',this.value)">
+        </div>
+      </div>
+
+      <div class="prod-grid">
+        <div class="fl">
+          <label>MOQ (min. commande)</label>
+          <input type="number" inputmode="numeric" class="fi" value="${d.moq||''}" placeholder="Ex: 10" oninput="updateProd(${id},'moq',this.value)">
+        </div>
+        <div class="fl">
+          <label>Origine</label>
+          <select class="fi" onchange="updateProd(${id},'origine',this.value)">
+            <option value="">---</option>
+            ${['Chine','Turquie','Local','Dubai','Maroc','Autre'].map(o=>`<option ${d.origine===o?'selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+
+      <div class="prod-grid">
+        <div class="fl">
+          <label>Qualité : <strong id="ql-${id}" style="color:var(--blue);">${d.qualite||3}/5</strong></label>
+          <input type="range" min="1" max="5" step="1" value="${d.qualite||3}" oninput="document.getElementById('ql-${id}').textContent=this.value+'/5';updateProd(${id},'qualite',this.value)">
+        </div>
+        <div class="fl">
+          <label>Disponibilité</label>
+          <select class="fi" onchange="updateProd(${id},'dispo',this.value)">
+            <option value="">---</option>
+            ${['En stock','Stock limité','Sur commande','Bientôt dispo'].map(o=>`<option ${d.dispo===o?'selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+
+      <div class="fl">
+        <label>Notes sur ce produit</label>
+        <textarea rows="2" class="fi" placeholder="Qualité des finitions, conditions de retour..." oninput="updateProd(${id},'notes',this.value)">${d.notes||''}</textarea>
+      </div>
+    </div>`;
+  wrap.appendChild(div);
+  updateProdCount();
+}
+
+function updateProd(id, field, val) {
+  const p = visit.produits.find(p=>p._id===id);
+  if(p) { p[field]=val; persist(); toast('✓ Sauvegardé'); }
+}
+
+function delProduit(id) {
+  if(!confirm('Supprimer ce produit ?')) return;
+  visit.produits = visit.produits.filter(p=>p._id!==id);
+  persist();
+  const el=document.getElementById('prow-'+id);
+  if(el) el.remove();
+  updateProdCount();
+  renumberRows();
+}
+
+function updateProdCount() {
+  const n=visit.produits.length;
+  document.getElementById('prod-count').textContent=n>0?n+' produit'+(n>1?'s':'')+' enregistré'+(n>1?'s':''):'';
+}
+
+function renumberRows() {
+  visit.produits.forEach((p,i)=>{
+    const row=document.getElementById('prow-'+p._id);
+    if(row) { const badge=row.querySelector('.prod-num'); if(badge) badge.textContent='Produit #'+(i+1); }
+  });
+}
+
+function renderProduits() {
+  document.getElementById('produits-list').innerHTML='';
+  if(visit.produits && visit.produits.length>0) {
+    visit.produits.forEach(p=>{ addProduit(p); });
+  }
+  updateProdCount();
+}
+
+// ─── SAVE VISIT TO CSV ───────────────────────────────────
+function saveVisit() {
+  if(!visit.fourn) { toast('⚠ Indique le nom du fournisseur','#854F0B'); return; }
+  if(!visit.produits||!visit.produits.length) { toast('⚠ Ajoute au moins un produit','#854F0B'); return; }
+  const hasPrix = visit.produits.some(p=>p.prixU);
+  if(!hasPrix) { toast('⚠ Remplis au moins un prix unitaire','#854F0B'); return; }
+
+  let count=0;
+  visit.produits.forEach(p=>{
+    if(!p.nom && !p.prixU) return;
+    csvRows.push([
+      visit.date, visit.marche, visit.fourn, visit.tel, visit.spec,
+      p.nom, p.prixU, p.prix20, p.prix50, p.moq,
+      p.qualite, p.origine, p.dispo, p.notes, visit.notes
+    ]);
+    count++;
+  });
+  persistCSV();
+  toast('✓ '+count+' produit(s) sauvegardé(s) dans le CSV','#3B6D11');
+}
+
+// ─── EXPORT CSV ─────────────────────────────────────────
+function exportCSV() {
+  if(!csvRows.length){ toast('⚠ Aucune donnée','#854F0B'); return; }
+  const esc=v=>'"'+String(v||'').replace(/"/g,'""')+'"';
+  const lines=[CSV_COLS.map(esc).join(',')+'\n',...csvRows.map(r=>r.map(esc).join(',')+'\n')];
+  const blob=new Blob(['\uFEFF'+lines.join('')],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download='sourcing_dz_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click(); URL.revokeObjectURL(url);
+  toast('✓ CSV téléchargé');
+}
+
+function clearCSV(){
+  if(!confirm('Supprimer toutes les données CSV ?')) return;
+  csvRows=[]; persistCSV(); renderCSV();
+  toast('🗑 CSV vidé');
+}
+
+// ─── RENDER CSV VIEW ─────────────────────────────────────
+function renderCSV() {
+  // Stats
+  const stats=document.getElementById('csv-stats');
+  const fournisseurs=[...new Set(csvRows.map(r=>r[2]).filter(Boolean))];
+  const produits=[...new Set(csvRows.map(r=>r[5]).filter(Boolean))];
+  stats.innerHTML=[
+    ['📋',csvRows.length,'Lignes'],
+    ['🏪',fournisseurs.length,'Fournisseurs'],
+    ['📦',produits.length,'Produits']
+  ].map(([ico,n,lab])=>`<div style="background:#fff;border-radius:10px;padding:10px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.07);">
+    <div style="font-size:20px;">${ico}</div>
+    <div style="font-size:22px;font-weight:600;color:var(--blue);">${n}</div>
+    <div style="font-size:10px;color:var(--gray);">${lab}</div>
+  </div>`).join('');
+
+  const view=document.getElementById('csv-view');
+  if(!csvRows.length){
+    view.innerHTML=`<div class="empty"><div class="empty-ico">📊</div><div class="empty-txt">Aucune donnée encore.<br>Remplis une fiche visite et appuie sur<br><strong>"Enregistrer la visite dans le CSV"</strong></div></div>`;
+    return;
+  }
+
+  // Group by product
+  const byProd={};
+  csvRows.forEach(r=>{ const p=r[5]||'Sans nom'; if(!byProd[p]) byProd[p]=[]; byProd[p].push(r); });
+
+  let html='';
+  Object.entries(byProd).forEach(([prod,rows])=>{
+    // Find best price
+    const prices=rows.map(r=>parseFloat(r[6])).filter(n=>!isNaN(n)&&n>0);
+    const minPrix=prices.length?Math.min(...prices):null;
+
+    html+=`<div class="cc2" style="margin-bottom:10px;">
+      <div style="font-size:13px;font-weight:600;color:var(--blue);margin-bottom:10px;">📦 ${prod} <span style="font-size:11px;color:var(--gray);font-weight:400;">(${rows.length} fournisseur${rows.length>1?'s':''})</span></div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th>Fournisseur</th><th>Marché</th><th>Px unit.</th><th>Px ×20</th><th>Px ×50</th><th>MOQ</th><th>Qualité</th><th>Origine</th><th>Dispo</th>
+          </tr></thead>
+          <tbody>`;
+    rows.forEach(r=>{
+      const isBest=minPrix&&parseFloat(r[6])===minPrix;
+      html+=`<tr>
+        <td><strong>${r[2]||'-'}</strong><br><span style="font-size:9px;color:#888;">${r[0]||''} ${r[1]?'· '+r[1]:''}</span></td>
+        <td>${r[1]||'-'}</td>
+        <td class="${isBest?'best':''}">${r[6]?r[6]+' DZD':'-'}${isBest?' 🏆':''}</td>
+        <td>${r[7]?r[7]+' DZD':'-'}</td>
+        <td>${r[8]?r[8]+' DZD':'-'}</td>
+        <td>${r[9]||'-'}</td>
+        <td>${r[10]?'⭐'.repeat(Math.min(5,Math.round(r[10])))+' ('+r[10]+'/5)':'-'}</td>
+        <td>${r[11]||'-'}</td>
+        <td>${r[12]||'-'}</td>
+      </tr>`;
+    });
+    html+=`</tbody></table></div></div>`;
+  });
+  view.innerHTML=html;
+}
+
+// ─── CHECKS ─────────────────────────────────────────────
+function renderChecks(){
+  Object.keys(CHECKS).forEach(id=>{
+    const items=CHECKS[id];
+    const c=document.getElementById('lst-'+id);
+    const cnt=document.getElementById('cnt-'+id);
+    if(!c) return;
+    const done=items.filter((_,i)=>chk[id+i]).length;
+    if(cnt) cnt.textContent=done+'/'+items.length;
+    c.innerHTML='';
+    items.forEach((txt,i)=>{
+      const on=!!chk[id+i];
+      const d=document.createElement('div');
+      d.className='ci'+(on?' on':'');
+      d.innerHTML=`<div class="cc${on?' on':''}"></div><span class="ct${on?' on':''}">${txt}</span>`;
+      d.onclick=()=>{ chk[id+i]=!chk[id+i]; persist(); renderChecks(); updateProgress(); };
+      c.appendChild(d);
+    });
+  });
+  document.getElementById('lst-pieges').innerHTML=PIEGES.map(t=>`<div class="pg-item"><span style="color:var(--red);flex-shrink:0;">✕</span><span style="font-size:13px;color:#333;margin-left:8px;line-height:1.4;">${t}</span></div>`).join('');
+}
+
+function updateProgress(){
+  const total=Object.values(CHECKS).reduce((s,a)=>s+a.length,0);
+  const done=Object.values(chk).filter(Boolean).length;
+  const pct=Math.round((done/total)*100);
+  document.getElementById('pgbar').style.width=pct+'%';
+  document.getElementById('subtitle').textContent=pct===0?'Été 2026 · Marché Algérien':pct+'% checks · '+done+'/'+total;
+}
+
+// ─── CALCUL ─────────────────────────────────────────────
+function mt(l,v,bg,fc){ return `<div class="mt" style="background:${bg};"><div style="font-size:10px;color:${fc};margin-bottom:3px;">${l}</div><div style="font-size:16px;font-weight:500;color:${fc};">${v}</div></div>`; }
+function calcR(){
+  const a=parseFloat(document.getElementById('ca').value)||0;
+  const l=parseFloat(document.getElementById('cl').value)||0;
+  const p=parseFloat(document.getElementById('cp').value)||0;
+  const res=document.getElementById('calc-res');
+  if(!a){res.style.display='none';return;}
+  const minV=a*3,couts=a+l+p,marge=minV-couts,pct=minV?Math.round((marge/minV)*100):0;
+  const ok=marge>0&&pct>30,med=marge>0;
+  res.style.display='block';
+  res.innerHTML=`<div class="mg">
+    ${mt('Prix min à vendre',Math.round(minV).toLocaleString()+' DZD','#E6F1FB','#185FA5')}
+    ${mt('Coûts totaux',Math.round(couts).toLocaleString()+' DZD','#F1EFE8','#5F5E5A')}
+    ${mt('Marge nette',Math.round(marge).toLocaleString()+' DZD',marge>0?'#EAF3DE':'#FCEBEB',marge>0?'#3B6D11':'#A32D2D')}
+    ${mt('% de marge',pct+'%',ok?'#EAF3DE':med?'#FAEEDA':'#FCEBEB',ok?'#3B6D11':med?'#854F0B':'#A32D2D')}
+  </div>
+  <div class="verdict" style="background:${ok?'#EAF3DE':med?'#FAEEDA':'#FCEBEB'};color:${ok?'#3B6D11':med?'#854F0B':'#A32D2D'};">
+    ${ok?'✓ Rentable !':med?'⚠ Marge faible, négocie !':'✕ Trop cher.'}
+  </div>`;
+}
+function calcS(){
+  const p=parseFloat(document.getElementById('cs').value)||0;
+  const res=document.getElementById('stock-res');
+  if(!p){res.style.display='none';return;}
+  res.style.display='block';
+  res.innerHTML=`<div class="mg">
+    ${mt('10 unités (test)',(p*10).toLocaleString()+' DZD','#E6F1FB','#185FA5')}
+    ${mt('20 unités',(p*20).toLocaleString()+' DZD','#E6F1FB','#185FA5')}
+    ${mt('50 unités',(p*50).toLocaleString()+' DZD','#FAEEDA','#854F0B')}
+    ${mt('100 unités',(p*100).toLocaleString()+' DZD','#FAEEDA','#854F0B')}
+  </div>`;
+}
+
+// ─── NAV ────────────────────────────────────────────────
+function showTab(tab,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tb').forEach(b=>b.className='tb off');
+  document.getElementById('panel-'+tab).classList.add('active');
+  if(btn) btn.className='tb on';
+  if(tab==='csv') renderCSV();
+}
+
+function resetVisit(){
+  if(!confirm('Vider le formulaire ? (Le CSV n\'est pas effacé)')) return;
+  visit={date:'',marche:'',fourn:'',tel:'',spec:'',notes:'',produits:[]};
+  prodId=0;
+  persist();
+  ['v-date','v-marche','v-fourn','v-tel','v-spec','v-notes'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('produits-list').innerHTML='';
+  updateProdCount();
+  toast('Formulaire vidé');
+}
+
+// ─── INIT ────────────────────────────────────────────────
+function init(){
+  load();
+  if(visit.produits&&visit.produits.length) {
+    prodId=Math.max(...visit.produits.map(p=>p._id||0),0);
+  }
+  ['v-date','v-marche','v-fourn','v-tel','v-spec','v-notes'].forEach(f=>{
+    const el=document.getElementById(f.replace('v-','v-'));
+    if(el&&visit[f.replace('v-','')]) el.value=visit[f.replace('v-','')];
+  });
+  // restore fields manually
+  document.getElementById('v-date').value=visit.date||'';
+  document.getElementById('v-marche').value=visit.marche||'';
+  document.getElementById('v-fourn').value=visit.fourn||'';
+  document.getElementById('v-tel').value=visit.tel||'';
+  document.getElementById('v-spec').value=visit.spec||'';
+  document.getElementById('v-notes').value=visit.notes||'';
+  renderProduits();
+  renderChecks();
+  updateProgress();
+}
+init();
+</script>
+</body>
+</html>
